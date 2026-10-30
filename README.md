@@ -70,4 +70,20 @@ docker run --rm -v "${PWD}:/app" -v /app/node_modules -w /app node:24-alpine sh 
 - `-v /app/node_modules` : le conteneur installe ses propres dépendances pour Linux ; le `node_modules` de Windows (programmes compilés pour Windows) n'est pas utilisé.
 - Le dossier `dist` est écrit dans le projet, prêt à être servi par Apache.
 
+## Démarrer l'environnement avec Docker Compose
 
+Services décrits dans `compose.yaml` : `web` (Apache 2.4), `db` (MySQL 8.4), `adminer` (Adminer 6).
+Ils remplacent les commandes `docker run` d'Apache et de MySQL des parties précédentes.
+
+1. Copier le modèle des variables avec `Copy-Item .env.example .env`, puis mettre ses propres mots de passe de test dans `.env`.
+2. Construire le portfolio (`npm run build` dans `C:\dev\portfolio-v5`), puis démarrer avec `docker compose up -d`.
+
+| Service              | Adresse                              |
+| -------------------- | ------------------------------------ |
+| Portfolio (Apache)   | http://localhost:8080                |
+| Adminer              | http://localhost:8081 (serveur `db`) |
+| MySQL depuis Windows | `localhost`, port 3307               |
+
+- Vérifier : `docker compose ps`, `docker compose logs db`
+- Arrêter : `docker compose down` (les données sont conservées dans le volume)
+- ⚠️ `docker compose down -v` supprime aussi le volume : toutes les données de la base sont effacées.
