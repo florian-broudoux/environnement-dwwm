@@ -58,3 +58,16 @@ docker run -d --name dwwm-adminer --network dwwm -p 8081:8080 adminer:6
 - Depuis un outil de Windows : `localhost`, port 3307.
 - Test de persistance réussi le 29/10/2026 : table `contacts` retrouvée après `docker stop` et `docker rm` de `dwwm-mysql`, puis recréation du conteneur.
 
+## Construire le portfolio avec Node.js dans un conteneur
+
+Depuis `C:\dev\portfolio-v5`, dans PowerShell :
+
+```powershell
+docker run --rm -v "${PWD}:/app" -v /app/node_modules -w /app node:24-alpine sh -c "npm ci && npm run build"
+```
+
+- Node.js 24 (image `node:24-alpine`), sans dépendre de la version installée sur le poste.
+- `-v /app/node_modules` : le conteneur installe ses propres dépendances pour Linux ; le `node_modules` de Windows (programmes compilés pour Windows) n'est pas utilisé.
+- Le dossier `dist` est écrit dans le projet, prêt à être servi par Apache.
+
+
