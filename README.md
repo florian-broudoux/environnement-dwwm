@@ -78,12 +78,29 @@ Ils remplacent les commandes `docker run` d'Apache et de MySQL des parties préc
 1. Copier le modèle des variables avec `Copy-Item .env.example .env`, puis mettre ses propres mots de passe de test dans `.env`.
 2. Construire le portfolio (`npm run build` dans `C:\dev\portfolio-v5`), puis démarrer avec `docker compose up -d`.
 
-| Service              | Adresse                              |
-| -------------------- | ------------------------------------ |
-| Portfolio (Apache)   | http://localhost:8080                |
-| Adminer              | http://localhost:8081 (serveur `db`) |
-| MySQL depuis Windows | `localhost`, port 3307               |
+| Service              | Adresse                                         |
+| -------------------- | ----------------------------------------------- |
+| Portfolio (Apache)   | http://localhost:8080                           |
+| Adminer              | http://localhost:8081 (serveur `db`)            |
+| MySQL depuis Windows | `localhost`, port 3307                          |
+| SFTP                 | `localhost`, port 2222, utilisateur `webmestre` |
 
 - Vérifier : `docker compose ps`, `docker compose logs db`
 - Arrêter : `docker compose down` (les données sont conservées dans le volume)
 - ⚠️ `docker compose down -v` supprime aussi le volume : toutes les données de la base sont effacées.
+
+## Publier le portfolio en SFTP
+
+1. Construire le portfolio : `npm run build` dans `C:\dev\portfolio-v5`.
+2. Lire l'empreinte du serveur : `docker compose exec sftp ssh-keygen -lf /etc/ssh/ssh_host_ed25519_key.pub`.
+3. WinSCP (winscp.net) : protocole SFTP, hôte `localhost`, port 2222, utilisateur `webmestre`, mot de passe du `.env`.
+4. Comparer l'empreinte affichée par WinSCP avec celle de l'étape 2, puis accepter.
+5. Vider le dossier `site` du serveur, puis y téléverser le contenu de `dist`.
+6. Vérifier sur http://localhost:8080.
+
+Le serveur fabrique de nouvelles clés quand son conteneur est recréé : l'empreinte change alors, et doit être vérifiée de nouveau.
+
+## Construire le portfolio avec Node.js dans un conteneur
+
+Depuis `C:\dev\portfolio-v5`, dans PowerShell : `docker run --rm -v "${PWD}:/app" -v /app/node_modules -w /app node:24-alpine sh -c "npm ci && npm run build"`.
+Le conteneur installe ses propres dépendances pour Linux ; le `node_modules` de Windows n'est pas utilisé.

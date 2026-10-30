@@ -4,7 +4,15 @@ services:
     ports:
       - "8080:80"
     volumes:
-      - ../portfolio-v5/dist:/usr/local/apache2/htdocs:ro
+      - ./site:/usr/local/apache2/htdocs:ro
+
+  sftp:
+    image: atmoz/sftp:alpine
+    ports:
+      - "127.0.0.1:2222:22"
+    command: "webmestre:${SFTP_MOT_DE_PASSE:?Renseignez SFTP_MOT_DE_PASSE dans .env}:1001"
+    volumes:
+      - ./site:/home/webmestre/site
 
   db:
     image: mysql:8.4
